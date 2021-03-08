@@ -1,0 +1,28 @@
+version: "3.9"
+#volumes for persist database and redis data
+volumes:
+  db-data:
+
+services:
+  redis:
+    image: redis:alpine
+
+  db:
+    image: postgres:alpine
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    env_file: ./dev_docker/.env
+
+  web:
+    build:
+      context: .
+      dockerfile: ./dev_docker/Dockerfile
+    env_file: ./dev_docker/.env
+    volumes:
+      - .:/myapp
+    ports:
+      - "5000:5000"
+      - "3035:3035"
+    depends_on:
+      - db
+      - redis
